@@ -15,7 +15,7 @@ after_success:
   - docket build -t sharat06/multi-worker ./worker
   #login into docker hub using docker CLI 
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  #take those images and push to docker hub
+  #Take those images and push to docker hub
   - docker push sharat06/multi-client
   - docker push sharat06/multi-nginx
   - docker push sharat06/multi-server
