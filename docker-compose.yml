@@ -1,0 +1,60 @@
+#version used by dockercompose.
+version: '3'       
+
+#Services is used to define what service dockers we need to create and run. 
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+
+  redis:
+    image: 'redis:latest'
+
+  nginx:
+    restart: always
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - 3500:80
+    depends_on:
+      - api
+      - client
+
+  api:
+    build:
+      context: ./server           #Context is used to tell docker to look into what folder in the project
+      dockerfile: Dockerfile.dev  #dockerfile is used to to mention which dockerfile to be referred. Used for custom dockerfile
+    volumes:
+      - /app/node_modules       #this ensures nd_mod dir inside container doesn't get over written by nd_mod dir present inside server dir project 
+      - ./server:/app             #defining volume in this way means everything inside server dir should be shared with "app" dir inside the container
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+    depends_on:
+      - postgres
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - ./client:/app
+
+  worker: 
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - ./worker:/app 
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379 
