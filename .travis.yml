@@ -1,0 +1,23 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t sharat06/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run  sharat06/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t sharat06/multi-client ./client
+  - docket build -t sharat06/multi-nginx ./nginx
+  - docket build -t sharat06/multi-server ./server
+  - docket build -t sharat06/multi-worker ./worker
+  #login into docker hub using docker CLI 
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  #take those images and push to docker hub
+  - docker push sharat06/multi-client
+  - docker push sharat06/multi-nginx
+  - docker push sharat06/multi-server
+  - docker push sharat06/multi-worker
+
