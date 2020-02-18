@@ -10,9 +10,9 @@ script:
 
 after_success:
   - docker build -t sharat06/multi-client ./client
-  - docket build -t sharat06/multi-nginx ./nginx
-  - docket build -t sharat06/multi-server ./server
-  - docket build -t sharat06/multi-worker ./worker
+  - docker build -t sharat06/multi-nginx ./nginx
+  - docker build -t sharat06/multi-server ./server
+  - docker build -t sharat06/multi-worker ./worker
   #login into docker hub using docker CLI 
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   #Take those images and push to docker hub
